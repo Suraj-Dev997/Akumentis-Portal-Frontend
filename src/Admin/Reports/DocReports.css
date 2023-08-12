@@ -1,3 +1,25 @@
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.table tbody tr:hover {
+  background-color: #f5f5f5;
+}
 .page-container {
   width: 100%;
   float: left;
@@ -21,7 +43,7 @@
 .page-container .page-content {
   min-height: 100%;
   margin-left: 220px;
-  background: #f5f5f5 url("/images/bg.png") left top repeat;
+  background: #edb3ff;
   position: relative;
   zoom: 1;
 }
@@ -203,7 +225,7 @@ body.page-container-boxed .page-container {
   z-index: 3;
 }
 .x-navigation {
-  background: #145770;
+  background: #370547;
   /* NAV LIST ELEMENT */
   /* END NAV LIST ELEMENT */
   /* NAV LIST FIRST ELEMENT */
@@ -391,7 +413,7 @@ body.page-container-boxed .page-container {
   color: #fff !important;
 }
 .x-navigation > li.xn-logo > a:first-child:hover {
-  background-color: #145770;
+  background-color: #370547;
 }
 .x-navigation .x-navigation-control {
   position: absolute;
@@ -892,7 +914,7 @@ body.page-container-boxed .page-container {
 }
 .btn-success {
   background-color: #5e1076;
-  border-color: #145770;
+  border-color: #370547;
 }
 .btn-success:hover,
 .btn-success:focus,
@@ -909,7 +931,7 @@ body.page-container-boxed .page-container {
 }
 .createuser {
   margin: 10px;
-  margin-left: 60vw;
+  width: 10%;
 }
 
 .panel.panel-default {
@@ -1226,7 +1248,7 @@ td.dataTables_empty {
 .dataTables_paginate .paginate_button.current:hover {
   background: #5e1076;
   color: #fff;
-  border-color: #145770;
+  border-color: #370547;
 }
 .dataTables_paginate a.paginate_disabled_previous,
 .dataTables_paginate a.paginate_button_disabled,
@@ -1306,7 +1328,7 @@ td.dataTables_empty {
   .x-navigation {
     max-height: 50px;
     overflow: hidden;
-    background: #145770;
+    background: #370547;
   }
   .x-navigation.x-navigation-panel {
     height: 50px;
@@ -1397,7 +1419,7 @@ td.dataTables_empty {
 }
 
 .pag-but-bg {
-  background-color: #145770;
+  background-color: #370547;
   color: white;
   padding: 5px 15px;
 }
