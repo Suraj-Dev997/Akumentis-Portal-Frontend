@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./ViewDoc.css"
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -8,7 +8,7 @@ const ViewDoc = () => {
  
     const {id} = useParams();
     const [docdata , setDocData] = useState([])
-
+    const navigate = useNavigate();
     useEffect(()=>{
         getAllDoc();
     },[])
@@ -21,6 +21,14 @@ const ViewDoc = () => {
             console.log(error)
         }
     }
+   
+    const handelLogOut = ()=>{
+    
+   
+      sessionStorage.removeItem("IsAdminLoggedIn");
+      navigate("/adminLogin");
+    
+   }
 
   return (
     <div className="page-container">
@@ -28,12 +36,19 @@ const ViewDoc = () => {
         {/* X-NAVIGATION */}
         <ul className="x-navigation">
           <li className="xn-logo">
-            <Link to="/report">
-              <h1>Logo</h1>
+          <Link to={"/dashboard/report"} className="brand-link text-center">
+              <span className="brand-text font-weight-light">
+                <img
+                  src="/images/Logo.png"
+                  alt=""
+                  className="logoMain"
+                  style={{}}
+                />
+              </span>
             </Link>
           </li>
           <li>
-            <Link to="/report">
+            <Link to="/dashboard/report">
               <span className="fa fa-file-pdf-o"></span>{" "}
               <span className="xn-text">Reports</span>
             </Link>
@@ -68,9 +83,9 @@ const ViewDoc = () => {
 
                   <div className="dropdown-divider"></div>
                   
-                  <Link to={"/AdminLogin"} className="dropdown-item">
+                  <div onClick={handelLogOut} className="dropdown-item">
                     <i className="fas fa-sign-out-alt mr-2"></i>Logout
-                  </Link>
+                  </div>
                 </a>
               </div>
           </li>
@@ -81,8 +96,8 @@ const ViewDoc = () => {
         
           <div className="row mb-2">
             <div className="col-sm-6"></div>
-            <Link to="/report" className="col-sm-12 text-left">
-                  <button type="button"  className="docbtn btn btn-primary">
+            <Link to="/dashboard/report" className="col-sm-12 text-left">
+                  <button type="button"  className="btn btn-primary">
                             <i className="fas fa-arrow-left"></i>
                   </button>
             </Link>
@@ -200,56 +215,82 @@ function DocList({doctor}){
                     <p>Doctor Photo</p>
                   </div>
                   <div className="docform">
-                    <div className="row mt-2">
-                      <div className="col-sm-6">
-                        <div className="form-group">
-                          <label>Dr Name*</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="Name1"
-                            maxLength="50"
-                            //tabIndex="1"
-                            placeholder=" "
-                            value={`Dr. ${doctor.name}`}
-                            disabled=""
-                          />
-                        </div>
-                      </div>
-                      <div className="col-sm-6">
-                        <div className="form-group">
-                          <label>Address</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id={`Address-${doctor.id}`}
-                            maxLength="200"
-                            placeholder=" "
-                            value={doctor.city}
-                            disabled
-                          />
-                        </div>
+                  <div className="row mt-2">
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>Dr Name*</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="Name1"
+                          maxLength="50"
+                          //tabIndex="1"
+                          placeholder=" "
+                          value={`Dr. ${doctor.name}`}
+                          disabled
+                        />
                       </div>
                     </div>
-                    <div className="row mt-2">
-                      <div className="col-sm-6">
-                        <div className="form-group">
-                          <label>Mobile</label>
-                          <input
-                            type="text"
-                            id={`Mobile-${doctor.id}`}
-                            className="form-control"
-                            maxLength="200"
-                            placeholder=" "
-                            disabled
-                            value={doctor.mobile}
-                          />
-                        </div>
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>BirthDate</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`BirthDate-${doctor.id}`}
+                        
+                        
+                          value={doctor.dateofbirth}                          
+                          disabled
+                        />
                       </div>
-
-                      <div className="col-sm-6"></div>
                     </div>
                   </div>
+                  <div className="row mt-2">
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>Qualification*</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={`Qualification-${doctor.id}`}
+                          maxLength="18"
+                          disabled
+                          value={doctor.qualification}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>Speciality</label>
+                        <input
+                          type="text"
+                          id={`Speciality-${doctor.id}`}
+                          className="form-control"
+                          maxLength="200"
+                          placeholder=" "
+                          disabled
+                          value={doctor.speciliaty}                          
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>MCL code</label>
+                        <input
+                          type="text"
+                          id={`mclcode-${doctor.id}`}
+                          className="form-control"
+                          
+                          disabled
+                          value={doctor.mclcode}                          
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 </div>
               </div>
             </div>

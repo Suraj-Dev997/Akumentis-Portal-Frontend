@@ -1,6 +1,6 @@
 import "./DashboardContent.css";
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BASEURL } from "../../constant/constant";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -9,77 +9,35 @@ import { IdContext } from "../../context/AuthContext";
 import CropImg from "../../utils/CropImg";
 import ConfirmationPopup from "../../utils/Popup";
 import Loader from "../../utils/Loader";
-import ImageSelector from "../../utils/ImgSelector";
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { parse, format } from 'date-fns';
 const DashboardContent = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
+  
   const [doctordata, setDoctordata] = useState([]);
-
   const [name, setName] = useState("");
-  const [city, setAddress] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [img, setImage] = useState("");
+  const [birthdate1, setBirthdate] = useState(null);
   const [qualification, setQualification] = useState("");
+  const [speciality, setSpeciality] = useState("");
+  const [mclcode, setMclcode] = useState("");
+  const [img, setImage] = useState("");
   const [loading, setLoading] = useState(false);
   const [cropmodel, setCropmodel] = useState(false);
   const [img1, setImage1] = useState("");
   const [cropper, setCropper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [posimg, setCombinedImageUrl] = useState("");
-  const images = [
-    {
-      id: 1,
-      category: "hairloss",
-      languages: ["english", "hindi"],
-      urlEnglish: "/images/enHair_Loss.jpg",
-      urlHindi: "/images/A3poster1.jpg",
-    },
-    {
-      id: 2,
-      category: "melasma",
-      languages: ["english", "hindi"],
-      urlEnglish: "/images/A3poster.jpg",
-      urlHindi: "/images/hiMelasma.jpg",
-    },
-  ];
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("hairloss");
-  const [selectedLanguage, setSelectedLanguage] = useState("english");
+  const navigate = useNavigate();
+   
 
-  console.log(selectedImages);
-  const toggleImageSelection = (imageUrl) => {
-    if (selectedImages.includes(imageUrl)) {
-      setSelectedImages(selectedImages.filter((url) => url !== imageUrl));
-    } else {
-      setSelectedImages([...selectedImages, imageUrl]);
-    }
-  };
+  
+  // custem birthdate logic
 
-  const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
-  };
-
-  const handleLanguageChange = (event) => {
-    setSelectedLanguage(event.target.value);
-  };
-
-  const filteredImages = images.filter(
-    (image) =>
-      image.category === selectedCategory &&
-      image.languages.includes(selectedLanguage)
-  );
-
-  const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + 2) % 2);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % 2);
-  };
-
+  //const [startDate, setStartDate] = useState(null);
+  const minDate = new Date('1960-01-01');
+    
+  //console.log(startDate && startDate.toLocaleDateString('en-GB'))
   //const {empId} = useContext(IdContext);
-
+ //console.log(birthdate1)
   const empId = sessionStorage.getItem("userId");
 
   const getCropData = async () => {
@@ -113,121 +71,48 @@ const DashboardContent = () => {
 
   const handelSubmit = async (e) => {
     e.preventDefault();
-    if (!img || !name || !city || !mobile || !qualification) {
+    if (!img || !name || !birthdate1 || !speciality ||!mclcode || !qualification) {
       toast.error("Missing required fields");
       return;
     }
     setShowConfirmation(true);
-
-    // try {
-    //   toast.info("Loading...");
-    //   //setLoading(true);
-    //   const formdata = new FormData();
-
-    //   formdata.append("empId",empId)
-    //    formdata.append("image",img)
-    //    formdata.append("name",name)
-    //    formdata.append("city",city)
-    //    formdata.append("mobile",mobile)
-    //    formdata.append("qualification",qualification)
-    //    await axios.post(`${BASEURL}/add-doctor`, formdata);
-
-    //   await getDoctor();
-    //   toast.success('Doctor created successfully');
-    //  // setLoading(false);
-    // ///uploading poster related to doctor
-    // // console.log("first")
-    // // let image1 = URL.createObjectURL(img)
-    // // const profileUrl = image1;
-    // // const posterUrl = '../../dist/img/Hair_Loss.jpg'
-    // // const doctorName = name;
-    // // const doctorDesignation = "Cardiologist";
-
-    // // console.log("come till heare1")
-    // // combineImages(profileUrl, posterUrl, doctorName, doctorDesignation)
-    // //   .then(async(combinedImageUrl) => {
-    // //     // setCombinedImageUrl(combinedImageUrl);
-    // // console.log("come till heare2");
-
-    // //     const posterUrl = await uploadFile(combinedImageUrl);
-    // //     console.log("poster url",posterUrl);
-    // //   })
-    // //   .catch((error) => {
-    // //     console.error("Error combining images:", error);
-    // //   });
-
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    // setName("");
-    // setAddress("");
-    // setMobile("");
-    // setImage("");
-    // setQualification("")
   };
 
   const handleConfirm = async () => {
     try {
       setShowConfirmation(false);
-      //setLoading(true);
+      setLoading(true);
       const formdata = new FormData();
-
+      const birthdate2 = birthdate1.toLocaleDateString('en-GB')
+      const birthdate = birthdate2.replace(/\//g, '-');
+      console.log(birthdate)
       formdata.append("empId", empId);
       formdata.append("image", img);
       formdata.append("name", name);
-      formdata.append("city", city);
-      formdata.append("mobile", mobile);
+      formdata.append("birthdate", birthdate);
+      formdata.append("speciality", speciality);
       formdata.append("qualification", qualification);
-      // const doctorPromise = await axios.post(`${BASEURL}/add-doctor`, formdata);
+      formdata.append("mclcode", mclcode);
 
-      // let doctor_id = doctorPromise.data.doctorId;
+       const doctorPromise = await axios.post(`${BASEURL}/add-doctor`, formdata);
 
-      // await getDoctor();
-      // setLoading(false);
-      // toast.success("Doctor created successfully");
+       let doctor_id = doctorPromise.data.doctorId;
 
-      // axios
-      //   .post(`${BASEURL}/saveSelection`, {
-      //     doctorId: doctor_id,
-      //     selectedImageUrls: selectedImages,
-      //   })
-      //   .then((response) => {
-      //     console.log(response.data);
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
-      // setLoading(false);
-      //uploading poster related to doctor
-      console.log("first");
-      let image1 = URL.createObjectURL(img);
-      const profileUrl = image1;
-      const posterUrl = "/images/enHair_Loss.jpg";
-      const doctorName = name;
-      const doctorDesignation = qualification;
-
-      console.log("come till heare1");
-      console.log(profileUrl, doctorName, doctorDesignation);
-      combineImages(profileUrl, posterUrl, doctorName, doctorDesignation)
-        .then(async (combinedImageUrl) => {
-          setCombinedImageUrl(combinedImageUrl);
-          console.log(combinedImageUrl);
-          console.log("come till heare2");
-
-          //     const posterUrl = await uploadFile(combinedImageUrl);
-          //     console.log("poster url",posterUrl);
-        })
-        .catch((error) => {
-          console.error("Error combining images:", error);
-        });
+       await getDoctor();
+       setLoading(false);
+       toast.success("Doctor created successfully");
+      setLoading(false);
+      navigate(`/dashboard/poster/${doctor_id}`)
     } catch (error) {
       console.log(error);
     }
     setName("");
-    setAddress("");
-    setMobile("");
+    setBirthdate("");
+    setSpeciality("");
     setImage("");
+    setMclcode("");
     setQualification("");
+    
   };
   const handleCancel = () => {
     setShowConfirmation(false);
@@ -248,7 +133,7 @@ const DashboardContent = () => {
                 <button
                   type="button"
                   id="Login1"
-                  className="docbtn btn btn-primary float-right"
+                  className="btn btn-primary float-right"
                   data-toggle="modal"
                   data-target="#adddoc"
                 >
@@ -304,106 +189,8 @@ const DashboardContent = () => {
               </button>
 
               <div id="container">
-                {currentIndex === 1 ? (
-                  <div className="contentdiv active">
+              <div className="contentdiv active">
                     <form id="formlogin" onSubmit={handelSubmit}>
-                      <div id="Register" className="AddDocMain text-center">
-                        <h3>Select Poster</h3>
-
-                        <div className="form-group mt-2">
-                          <label htmlFor="categorySelect">
-                            Select Category:
-                          </label>
-                          <select
-                            className="form-control"
-                            id="categorySelect"
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                          >
-                            <option value="hairloss">Hair Loss</option>
-                            <option value="melasma">Melasma</option>
-                          </select>
-                        </div>
-
-                        <div className="form-group">
-                          <label htmlFor="languageSelect">
-                            Select Language:
-                          </label>
-                          <select
-                            className="form-control"
-                            id="languageSelect"
-                            value={selectedLanguage}
-                            onChange={handleLanguageChange}
-                          >
-                            <option value="english">English</option>
-                            <option value="hindi">Hindi</option>
-                            <option value="marathi">Marathi</option>
-                          </select>
-                        </div>
-
-                        <div className="docform mt-1" style={{ height: "" }}>
-                          <div className="container-fluid">
-                            <div className="image-list">
-                              {filteredImages.map((image) => (
-                                <div
-                                  key={image.id}
-                                  className={`image-item ${
-                                    selectedImages.includes(
-                                      image[
-                                        `url${
-                                          selectedLanguage
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                          selectedLanguage.slice(1)
-                                        }`
-                                      ]
-                                    )
-                                      ? "selected"
-                                      : ""
-                                  }`}
-                                  onClick={() =>
-                                    toggleImageSelection(
-                                      image[
-                                        `url${
-                                          selectedLanguage
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                          selectedLanguage.slice(1)
-                                        }`
-                                      ]
-                                    )
-                                  }
-                                >
-                                  <img
-                                    style={{ width: "150px", height: "180px" }}
-                                    src={
-                                      image[
-                                        `url${
-                                          selectedLanguage
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                          selectedLanguage.slice(1)
-                                        }`
-                                      ]
-                                    }
-                                    alt={`Image ${image.id}`}
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <input
-                        className="btn btn-primary"
-                        style={{ width: "200px", marginLeft: "20vw" }}
-                        type="submit"
-                      />
-                    </form>
-                  </div>
-                ) : (
-                  <div className="contentdiv active">
-                    <form id="formlogin">
                       <div id="Register" className="AddDocMain text-cente">
                         <h3>Add Doctors Details</h3>
                         <div className="docphoto">
@@ -455,38 +242,23 @@ const DashboardContent = () => {
                             </div>
                             <div className="col-sm-6">
                               <div className="form-group">
-                                <label>Address*</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="Address"
-                                  maxLength="18"
-                                  placeholder=" "
-                                  value={city}
-                                  onChange={(e) => {
-                                    setAddress(e.target.value);
-                                  }}
-                                />
+                                <label>Date of Birth*</label>
+                                <DatePicker
+       selected={birthdate1}
+      onChange={(date) => setBirthdate(date)}
+      peekNextMonth
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      minDate={minDate} // Set the minimum date
+      placeholderText="DD-MM-YYYY"
+      dateFormat="dd-MM-yyyy"
+      className="form-control"
+    />
                               </div>
                             </div>
                           </div>
                           <div className="row mt-2">
-                            <div className="col-sm-6">
-                              <div className="form-group">
-                                <label>Mobile*</label>
-                                <input
-                                  className="form-control"
-                                  type="tel"
-                                  name="mobileNumber"
-                                  value={mobile}
-                                  pattern="\d{10}"
-                                  maxLength="10"
-                                  onChange={(e) => {
-                                    setMobile(e.target.value);
-                                  }}
-                                />
-                              </div>
-                            </div>
                             <div className="col-sm-6">
                               <div className="form-group">
                                 <label>Qualification*</label>
@@ -502,9 +274,39 @@ const DashboardContent = () => {
                                 />
                               </div>
                             </div>
+                            <div className="col-sm-6">
+                              <div className="form-group">
+                                <label>Speciality*</label>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  name="speciality"
+                                  value={speciality}
+                              
+                                  onChange={(e) => {
+                                    setSpeciality(e.target.value);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <div className="col-sm-6">
+                              <div className="form-group">
+                                <label>MCL code*</label>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  name="mclcode"
+                                  value={mclcode}
+                              
+                                  onChange={(e) => {
+                                    setMclcode(e.target.value);
+                                  }}
+                                />
+                              </div>
+                            </div>
                           </div>
                           <div className="text-center mt-3">
-                            {/* <input type="submit" style={{ width: "22%" }} value="Submit" id="Login1" className="docbtn btn btn-success"/> */}
+                            <input type="submit" value="Submit" id="Login1" className="docbtn btn btn-success"/>
                             <span className="error regspan"></span>
                             <div
                               style={{
@@ -530,22 +332,7 @@ const DashboardContent = () => {
                       />
                     )}
                   </div>
-                )}
               </div>
-              <button
-                id="previousButton"
-                className="btn btn-primary "
-                onClick={handlePrevious}
-              >
-                Previous
-              </button>
-              <button
-                id="nextButton"
-                className="btn btn-primary float-right"
-                onClick={handleNext}
-              >
-                Next
-              </button>
             </div>
           </div>
         </div>
@@ -565,17 +352,36 @@ const DashboardContent = () => {
 export default DashboardContent;
 
 function DoctorList({ doctor, getDoctor }) {
+
+  const inputDateString = doctor.dateofbirth;
+
+
+
+  // Split the input date string by '-' to get day, month, and year components
+  const [day, month, year] = inputDateString.split('-');
+  
+  // Rearrange the components to form the "yyyy-mm-dd" format
+  const convertedDateString = `${year}-${month}-${day}`;
+  
+  console.log("converted date",convertedDateString);
+  // Format the Date object
+  //const formattedDate = parsedDate.toString();
+  //console.log(for)
+
   const [img, setImage] = useState(null);
   const [name, setName] = useState(doctor.name);
-  const [city, setAddress] = useState(doctor.city);
-  const [mobile, setMobile] = useState(doctor.mobile);
+  const [birthdate1, setBirthdate] = useState(new Date(convertedDateString));
   const [qualification, setQualification] = useState(doctor.qualification);
+  const [speciality, setSpeciality] = useState(doctor.speciliaty);
+  const [mclcode, setMclcode] = useState(doctor.mclcode);
   const [cropmodel, setCropmodel] = useState(false);
   const [img1, setImage1] = useState("");
   const [cropper, setCropper] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading1, setLoading1] = useState(false);
-
+  const minDate = new Date('1960-01-01');
+  
+  console.log("in edit section ", birthdate1)
   const getCropData = async () => {
     if (cropper) {
       const file = await fetch(cropper.getCroppedCanvas().toDataURL())
@@ -598,26 +404,6 @@ function DoctorList({ doctor, getDoctor }) {
     e.preventDefault();
     setShowConfirmation(true);
 
-    // try {
-    //   const formdata = new FormData();
-
-    //    formdata.append("image",img)
-    //    formdata.append("name",name)
-    //    formdata.append("city",city)
-    //    formdata.append("mobile",mobile)
-    //    formdata.append("qualification",qualification)
-
-    //   const doctorPromise = await axios.patch(`${BASEURL}/update/${id}`, formdata);
-    //   await getDoctor();
-    //   toast.success("Doctor Update successfully");
-    //   setName('');
-    //   setAddress('');
-    //   setMobile('');
-    //   setImage('');
-    //   setQualification('')
-    // } catch (error) {
-    //   console.log(error);
-    // }
   };
 
   const handelDelete = async (id) => {
@@ -633,13 +419,21 @@ function DoctorList({ doctor, getDoctor }) {
     setShowConfirmation(false);
     setLoading1(true);
     try {
-      const formdata = new FormData();
+      
+      
+     
 
+       let birthdate2 = birthdate1.toLocaleDateString('en-GB')
+       var birthdate = birthdate2.replace(/\//g, '-');
+     
+      
+      const formdata = new FormData();
       formdata.append("image", img);
       formdata.append("name", name);
-      formdata.append("city", city);
-      formdata.append("mobile", mobile);
+      formdata.append("birthdate", birthdate);
+      formdata.append("speciality", speciality);
       formdata.append("qualification", qualification);
+      formdata.append("mclcode", mclcode);
 
       const doctorPromise = await axios.patch(
         `${BASEURL}/update/${id}`,
@@ -654,7 +448,6 @@ function DoctorList({ doctor, getDoctor }) {
       setLoading1(false);
     }
   };
-
   const handleCancel = () => {
     // Hide the confirmation popup
     setShowConfirmation(false);
@@ -727,7 +520,7 @@ function DoctorList({ doctor, getDoctor }) {
         </div>
       )}
 
-      <div
+<div
         className="modal fade show"
         id={modalId}
         // data-backdrop="static"
@@ -780,35 +573,20 @@ function DoctorList({ doctor, getDoctor }) {
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
-                        <label>Address</label>
+                        <label>BirthDate</label>
                         <input
                           type="text"
                           className="form-control"
-                          id={`Address-${doctor.id}`}
-                          maxLength="200"
-                          placeholder=" "
-                          value={doctor.city}
+                          id={`BirthDate-${doctor.id}`}
+                        
+                        
+                          value={doctor.dateofbirth}                          
                           disabled
                         />
                       </div>
                     </div>
                   </div>
                   <div className="row mt-2">
-                    <div className="col-sm-6">
-                      <div className="form-group">
-                        <label>Mobile</label>
-                        <input
-                          type="text"
-                          id={`Mobile-${doctor.id}`}
-                          className="form-control"
-                          maxLength="200"
-                          placeholder=" "
-                          disabled
-                          value={doctor.mobile}
-                        />
-                      </div>
-                    </div>
-
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label>Qualification*</label>
@@ -819,6 +597,35 @@ function DoctorList({ doctor, getDoctor }) {
                           maxLength="18"
                           disabled
                           value={doctor.qualification}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>Speciality</label>
+                        <input
+                          type="text"
+                          id={`Speciality-${doctor.id}`}
+                          className="form-control"
+                          maxLength="200"
+                          placeholder=" "
+                          disabled
+                          value={doctor.speciliaty}                          
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label>MCL code</label>
+                        <input
+                          type="text"
+                          id={`mclcode-${doctor.id}`}
+                          className="form-control"
+                          
+                          disabled
+                          value={doctor.mclcode}                          
                         />
                       </div>
                     </div>
@@ -889,43 +696,30 @@ function DoctorList({ doctor, getDoctor }) {
                             className="form-control"
                             value={name}
                             onChange={(e) => {
-                              setName(e.target.value.trim());
+                              setName(e.target.value);
                             }}
                           />
                         </div>
                       </div>
                       <div className="col-sm-6">
                         <div className="form-group">
-                          <label>Address*</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            maxLength="18"
-                            value={city}
-                            onChange={(e) => {
-                              setAddress(e.target.value);
-                            }}
-                          />
+                          <label>Birth Date*</label>
+                          <DatePicker
+      selected={birthdate1}
+      onChange={(date) => setBirthdate(date)}
+      peekNextMonth
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      minDate={minDate} // Set the minimum date
+      placeholderText=""
+      dateFormat="dd-MM-yyyy"
+      className="form-control"
+    />
                         </div>
                       </div>
                     </div>
                     <div className="row mt-2">
-                      <div className="col-sm-6">
-                        <div className="form-group">
-                          <label>Mobile*</label>
-                          <input
-                            className="form-control"
-                            type="tel"
-                            name="mobileNumber"
-                            value={mobile}
-                            pattern="\d{10}"
-                            maxLength="10"
-                            onChange={(e) => {
-                              setMobile(e.target.value);
-                            }}
-                          />
-                        </div>
-                      </div>
                       <div className="col-sm-6">
                         <div className="form-group">
                           <label>Qualification*</label>
@@ -936,6 +730,35 @@ function DoctorList({ doctor, getDoctor }) {
                             value={qualification}
                             onChange={(e) => {
                               setQualification(e.target.value);
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-sm-6">
+                        <div className="form-group">
+                          <label>Speciality*</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            
+                            value={speciality}
+                            onChange={(e) => {
+                              setSpeciality(e.target.value);
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-sm-6">
+                        <div className="form-group">
+                          <label>MCL code*</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                          
+                            value={mclcode}
+                            onChange={(e) => {
+                              setMclcode(e.target.value);
                             }}
                           />
                         </div>
@@ -986,111 +809,3 @@ function DoctorList({ doctor, getDoctor }) {
   );
 }
 
-// function combineImages(profileUrl, posterUrl, doctorName, doctorDesignation) {
-//   console.log("running comine images")
-//   return new Promise((resolve) => {
-//     const profileImg = new Image();
-//     const posterImg = new Image();
-//     console.log("running comine images1")
-
-//     profileImg.src = profileUrl;
-//     posterImg.src = posterUrl;
-//     console.log("running comine images2")
-
-//     profileImg.onload = () => {
-//     console.log("running comine images5")
-
-//       posterImg.onload = () => {
-//     console.log("running comine images55")
-
-//         const canvas = document.createElement("canvas");
-//         canvas.width = posterImg.width;
-//         canvas.height = posterImg.height;
-
-//         const ctx = canvas.getContext("2d");
-
-//         ctx.drawImage(posterImg, 0, 0, posterImg.width, posterImg.height);
-
-//         // Draw the profile image in a circle
-//         const profileX = 200; // Adjust the position of the profile image
-//         const profileY = 2200; // Adjust the position of the profile image
-//         const profileSize = 600; // Adjust the size of the circular profile image
-
-//         ctx.save();
-//         ctx.beginPath();
-//         ctx.arc(profileX + profileSize / 2, profileY + profileSize / 2, profileSize / 2, 0, Math.PI * 2);
-//         ctx.closePath();
-//         ctx.clip();
-//         ctx.drawImage(profileImg, profileX, profileY, profileSize, profileSize);
-//         ctx.restore();
-
-//         ctx.font = "100px Arial";
-//         ctx.fillStyle = "black";
-
-//         //const textX = (canvas.width - ctx.measureText(doctorName).width) / 2;
-//         //const textY = canvas.height - 100;
-
-//         ctx.fillText(doctorName, 850, 2420);
-//         ctx.fillText(doctorDesignation, 850, 2580);
-//         console.log("running comine images3")
-
-//         const dataUrl = canvas.toDataURL("image/png");
-//         console.log("running comine images4")
-
-//         resolve(dataUrl);
-//       };
-//     };
-//   });
-// }
-
-function combineImages(profileUrl, doctorName, doctorDesignation) {
-  return new Promise((resolve) => {
-    const posterUrl = "/images/enHair_Loss.jpg"; // Update the poster URL here
-    const profileImg = new Image();
-    const posterImg = new Image();
-
-    profileImg.onload = () => {
-      posterImg.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = posterImg.width;
-        canvas.height = posterImg.height;
-
-        const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(posterImg, 0, 0, posterImg.width, posterImg.height);
-
-        // Draw the profile image in a circle
-        const profileX = 200; // Adjust the position of the profile image
-        const profileY = 2200; // Adjust the position of the profile image
-        const profileSize = 600; // Adjust the size of the circular profile image
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(
-          profileX + profileSize / 2,
-          profileY + profileSize / 2,
-          profileSize / 2,
-          0,
-          Math.PI * 2
-        );
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(profileImg, profileX, profileY, profileSize, profileSize);
-        ctx.restore();
-
-        ctx.font = "100px Arial";
-        ctx.fillStyle = "black";
-
-        ctx.fillText(doctorName, 850, 2420);
-        ctx.fillText(doctorDesignation, 850, 2580);
-
-        const dataUrl = canvas.toDataURL("image/png");
-        resolve(dataUrl);
-      };
-
-      posterImg.src = posterUrl; // Start loading the poster image
-    };
-
-    profileImg.src = profileUrl; // Start loading the profile image
-  });
-}

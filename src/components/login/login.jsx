@@ -3,8 +3,6 @@ import s from "./login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BASEURL } from "../../constant/constant";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { IdContext } from "../../context/AuthContext";
 function Login() {
   const [empId, setEmpId] = useState("");
@@ -20,13 +18,13 @@ function Login() {
     try {
       let response = await axios.post(`${BASEURL}/login`, { empId, password });
 
-      toast.success(response.data.message);
+      
       handelId(response.data.empID);
       sessionStorage.setItem("isLoggedIn", "true");
       sessionStorage.setItem("userId", response.data.empID);
-      setTimeout(() => {
+     
         navigate("/dashboard");
-      }, 2000);
+   
     } catch (error) {
       setError("Invalid Credential");
     }
@@ -108,7 +106,6 @@ function Login() {
           </div>
         </div>
       </div>
-      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 }

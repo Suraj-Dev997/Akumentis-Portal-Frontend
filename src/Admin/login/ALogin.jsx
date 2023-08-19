@@ -11,8 +11,9 @@ const AdminLogin = () => {
     e.preventDefault();
     
     if(username==="admin" && password==="admin123"){
-        navigate("/report")
-        toast.success("Login successful");
+        sessionStorage.setItem("IsAdminLoggedIn","true")
+        navigate("/dashboard/report")
+        
 
     }
     else{
